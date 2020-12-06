@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"encoding/csv"
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -9,15 +11,24 @@ import (
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Create a csv file",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("create called")
+		file, err := os.OpenFile("tmp/example.csv", os.O_WRONLY|os.O_CREATE, 0600)
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer file.Close()
+
+		err = file.Truncate(0)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		writer := csv.NewWriter(file)
+		for i := 0; i < 100; i++ {
+			writer.Write([]string{"hoge"})
+		}
+		writer.Flush()
 	},
 }
 
