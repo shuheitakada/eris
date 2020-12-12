@@ -4,7 +4,11 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"regexp"
+	"strconv"
+	"strings"
 
+	"github.com/shuheitakada/eris/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +32,17 @@ func NewCmdCreate() *cobra.Command {
 
 			writer := csv.NewWriter(file)
 			for i := 0; i < lineNumber; i++ {
-				writer.Write([]string{"hoge"})
+				if strings.HasPrefix(args[0], "/") && strings.HasSuffix(args[0], "/") {
+					str := strings.Trim(args[0], "/")
+					if regexp.MustCompile(`\\d{\d+}`).MatchString(str) {
+						lastIndex := len(str) - 1
+						digit, err := strconv.Atoi(str[3:lastIndex])
+						if err != nil {
+							fmt.Println(err)
+						}
+						writer.Write([]string{strconv.Itoa(pkg.CreateRandomNumber(digit))})
+					}
+				}
 			}
 			writer.Flush()
 		},
