@@ -12,14 +12,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var lineNumber int
+var (
+	lineNumber int
+	filepath   string
+)
 
 func NewCmdCreate() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create a csv file",
 		Run: func(cmd *cobra.Command, args []string) {
-			file, err := os.OpenFile("tmp/example.csv", os.O_WRONLY|os.O_CREATE, 0600)
+			file, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, 0600)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -47,6 +50,7 @@ func NewCmdCreate() *cobra.Command {
 			writer.Flush()
 		},
 	}
+	cmd.Flags().StringVarP(&filepath, "file", "f", "tmp/example.csv", "file path where the csv file is created")
 	cmd.Flags().IntVarP(&lineNumber, "line", "n", 100, "line number")
 	return cmd
 }
