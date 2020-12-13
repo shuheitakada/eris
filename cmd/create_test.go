@@ -7,50 +7,42 @@ import (
 	"testing"
 )
 
-func TestCreateRandomNumbers(t *testing.T) {
-	// eris create "/\d{4}/" -n 3 --file {{tmpfile}}
-	execCreateTest([]string{`/\d{4}/`, "-n", "3", "--file"}, `\A(\d{4}\n)+\z`, t)
+var createTests = []struct {
+	args     []string
+	expected string
+}{
+	{[]string{`/\d{4}/`, "-n", "3"}, `\A(\d{4}\n)+\z`},
+	{[]string{"dummy", "-n", "3"}, `\A(dummy\n)+\z`},
+	{[]string{`/\w{4}/`, "-n", "3"}, `\A(\w{4}\n)+\z`},
+	{[]string{"dummy-", `/\d{4}/`, "-n", "3"}, `\A(dummy-\d{4}\n)+\z`},
 }
 
-func TestCreateStrings(t *testing.T) {
-	// eris create "dummy" -n 3 --file {{tmpfile}}
-	execCreateTest([]string{"dummy", "-n", "3", "--file"}, `\A(dummy\n)+\z`, t)
-}
+func TestCreate(t *testing.T) {
+	for _, testCase := range createTests {
+		tmp, err := ioutil.TempFile("./", "tmp")
+		if err != nil {
+			t.Errorf("%v\n", err)
+		}
+		defer func() {
+			os.Remove(tmp.Name())
+		}()
 
-func TestCreateRandomStrings(t *testing.T) {
-	// eris create "/\w{4}/" -n 3 --file {{tmpfile}}
-	execCreateTest([]string{`/\w{4}/`, "-n", "3", "--file"}, `\A(\w{4}\n)+\z`, t)
-}
+		cmd := NewCmdCreate()
+		args := append(testCase.args, "--file", tmp.Name())
+		cmd.SetArgs(args)
+		cmd.Execute()
 
-func TestCreateStringAndRandomNumbers(t *testing.T) {
-	// eris create "dummy-" "/\d{4}/" -n 3 --file {{tmpfile}}
-	execCreateTest([]string{"dummy-", `/\d{4}/`, "-n", "3", "--file"}, `\A(dummy-\d{4}\n)+\z`, t)
-}
+		tmpfile, _ := os.Open(tmp.Name())
+		defer tmpfile.Close()
 
-func execCreateTest(args []string, want string, t *testing.T) {
-	tmp, err := ioutil.TempFile("./", "tmp")
-	if err != nil {
-		t.Errorf("%v\n", err)
-	}
-	defer func() {
-		os.Remove(tmp.Name())
-	}()
+		tmpContent, err := ioutil.ReadAll(tmpfile)
+		if err != nil {
+			t.Errorf("%v\n", err)
+		}
 
-	cmd := NewCmdCreate()
-	args = append(args, tmp.Name())
-	cmd.SetArgs(args)
-	cmd.Execute()
-
-	tmpfile, _ := os.Open(tmp.Name())
-	defer tmpfile.Close()
-
-	tmpContent, err := ioutil.ReadAll(tmpfile)
-	if err != nil {
-		t.Errorf("%v\n", err)
-	}
-
-	got := string(tmpContent)
-	if regexp.MustCompile(want).MatchString(got) == false {
-		t.Errorf("\nwant: %#v\ngot: %#v", want, got)
+		got := string(tmpContent)
+		if regexp.MustCompile(testCase.expected).MatchString(got) == false {
+			t.Errorf("\nexpected: %#v\ngot: %#v", testCase.expected, got)
+		}
 	}
 }
