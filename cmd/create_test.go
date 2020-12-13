@@ -9,15 +9,15 @@ import (
 
 func TestCreateRandomNumbers(t *testing.T) {
 	// eris create "/\d{4}/" -n 3 --file {{tmpfile}}
-	execTest([]string{`/\d{4}/`, "-n", "3", "--file"}, `\A(\d{4}\n)+\z`, t)
+	execCreateTest([]string{`/\d{4}/`, "-n", "3", "--file"}, `\A(\d{4}\n)+\z`, t)
 }
 
 func TestCreateStrings(t *testing.T) {
 	// eris create "dummy" -n 3 --file {{tmpfile}}
-	execTest([]string{"dummy", "-n", "3", "--file"}, `\A(dummy\n)+\z`, t)
+	execCreateTest([]string{"dummy", "-n", "3", "--file"}, `\A(dummy\n)+\z`, t)
 }
 
-func execTest(args []string, want string, t *testing.T) {
+func execCreateTest(args []string, want string, t *testing.T) {
 	tmp, err := ioutil.TempFile("./", "tmp")
 	if err != nil {
 		t.Errorf("%v\n", err)
