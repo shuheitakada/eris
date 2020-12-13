@@ -45,6 +45,8 @@ func NewCmdCreate() *cobra.Command {
 						}
 						writer.Write([]string{strconv.Itoa(pkg.CreateRandomNumber(digit))})
 					}
+				} else {
+					writer.Write([]string{args[0]})
 				}
 			}
 			writer.Flush()
