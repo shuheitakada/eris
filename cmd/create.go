@@ -35,19 +35,23 @@ func NewCmdCreate() *cobra.Command {
 
 			writer := csv.NewWriter(file)
 			for i := 0; i < lineNumber; i++ {
-				if strings.HasPrefix(args[0], "/") && strings.HasSuffix(args[0], "/") {
-					str := strings.Trim(args[0], "/")
-					if regexp.MustCompile(`\\d{\d+}`).MatchString(str) {
-						lastIndex := len(str) - 1
-						digit, err := strconv.Atoi(str[3:lastIndex])
-						if err != nil {
-							fmt.Println(err)
+				line := ""
+				for _, arg := range args {
+					if strings.HasPrefix(arg, "/") && strings.HasSuffix(arg, "/") {
+						str := strings.Trim(arg, "/")
+						if regexp.MustCompile(`\\d{\d+}`).MatchString(str) {
+							lastIndex := len(str) - 1
+							digit, err := strconv.Atoi(str[3:lastIndex])
+							if err != nil {
+								fmt.Println(err)
+							}
+							line += strconv.Itoa(pkg.CreateRandomNumber(digit))
 						}
-						writer.Write([]string{strconv.Itoa(pkg.CreateRandomNumber(digit))})
+					} else {
+						line += arg
 					}
-				} else {
-					writer.Write([]string{args[0]})
 				}
+				writer.Write([]string{line})
 			}
 			writer.Flush()
 		},

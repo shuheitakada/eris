@@ -17,6 +17,11 @@ func TestCreateStrings(t *testing.T) {
 	execCreateTest([]string{"dummy", "-n", "3", "--file"}, `\A(dummy\n)+\z`, t)
 }
 
+func TestCreateStringAndRandomNumbers(t *testing.T) {
+	// eris create "dummy-" "/\d{4}/" -n 3 --file {{tmpfile}}
+	execCreateTest([]string{"dummy-", `/\d{4}/`, "-n", "3", "--file"}, `\A(dummy-\d{4}\n)+\z`, t)
+}
+
 func execCreateTest(args []string, want string, t *testing.T) {
 	tmp, err := ioutil.TempFile("./", "tmp")
 	if err != nil {
