@@ -9,6 +9,15 @@ import (
 
 // eris create "/\d{4}/" -n 3 --file {{tmpfile}}
 func TestCreate(t *testing.T) {
+	execTest([]string{`/\d{4}/`, "-n", "3", "--file"}, `\A(\d{4}\n)+\z`, t)
+}
+
+// eris create "dummy" -n 3 --file {{tmpfile}}
+func TestCreate2(t *testing.T) {
+	execTest([]string{"dummy", "-n", "3", "--file"}, `\A(dummy\n)+\z`, t)
+}
+
+func execTest(args []string, want string, t *testing.T) {
 	tmp, err := ioutil.TempFile("./", "tmp")
 	if err != nil {
 		t.Errorf("%v\n", err)
@@ -16,8 +25,10 @@ func TestCreate(t *testing.T) {
 	defer func() {
 		os.Remove(tmp.Name())
 	}()
+
 	cmd := NewCmdCreate()
-	cmd.SetArgs([]string{`/\d{4}/`, "-n", "3", "--file", tmp.Name()})
+	args = append(args, tmp.Name())
+	cmd.SetArgs(args)
 	cmd.Execute()
 
 	tmpfile, _ := os.Open(tmp.Name())
@@ -29,7 +40,6 @@ func TestCreate(t *testing.T) {
 	}
 
 	got := string(tmpContent)
-	want := `\A(\d{4}\n)+\z`
 	if regexp.MustCompile(want).MatchString(got) == false {
 		t.Errorf("\nwant: %#v\ngot: %#v", want, got)
 	}
