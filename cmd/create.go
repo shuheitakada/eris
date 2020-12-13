@@ -39,13 +39,15 @@ func NewCmdCreate() *cobra.Command {
 				for _, arg := range args {
 					if strings.HasPrefix(arg, "/") && strings.HasSuffix(arg, "/") {
 						str := strings.Trim(arg, "/")
+						lastIndex := len(str) - 1
+						digit, err := strconv.Atoi(str[3:lastIndex])
+						if err != nil {
+							fmt.Println(err)
+						}
 						if regexp.MustCompile(`\\d{\d+}`).MatchString(str) {
-							lastIndex := len(str) - 1
-							digit, err := strconv.Atoi(str[3:lastIndex])
-							if err != nil {
-								fmt.Println(err)
-							}
 							line += strconv.Itoa(pkg.CreateRandomNumber(digit))
+						} else if regexp.MustCompile(`\\w{\d+}`).MatchString(str) {
+							line += pkg.CreateRandomString(digit)
 						}
 					} else {
 						line += arg
