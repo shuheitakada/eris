@@ -7,13 +7,13 @@ import (
 	"testing"
 )
 
-// eris create "/\d{4}/" -n 3 --file {{tmpfile}}
-func TestCreate(t *testing.T) {
+func TestCreateRandomNumbers(t *testing.T) {
+	// eris create "/\d{4}/" -n 3 --file {{tmpfile}}
 	execTest([]string{`/\d{4}/`, "-n", "3", "--file"}, `\A(\d{4}\n)+\z`, t)
 }
 
-// eris create "dummy" -n 3 --file {{tmpfile}}
-func TestCreate2(t *testing.T) {
+func TestCreateStrings(t *testing.T) {
+	// eris create "dummy" -n 3 --file {{tmpfile}}
 	execTest([]string{"dummy", "-n", "3", "--file"}, `\A(dummy\n)+\z`, t)
 }
 
