@@ -35,7 +35,8 @@ func NewCmdCreate() *cobra.Command {
 
 			writer := csv.NewWriter(file)
 			for i := 0; i < lineNumber; i++ {
-				line := ""
+				line := []string{""}
+				lineIndex := 0
 				for _, arg := range args {
 					if strings.HasPrefix(arg, "/") && strings.HasSuffix(arg, "/") {
 						str := strings.Trim(arg, "/")
@@ -45,15 +46,18 @@ func NewCmdCreate() *cobra.Command {
 							fmt.Println(err)
 						}
 						if regexp.MustCompile(`\\d{\d+}`).MatchString(str) {
-							line += strconv.Itoa(pkg.CreateRandomNumber(digit))
+							line[lineIndex] += strconv.Itoa(pkg.CreateRandomNumber(digit))
 						} else if regexp.MustCompile(`\\w{\d+}`).MatchString(str) {
-							line += pkg.CreateRandomString(digit)
+							line[lineIndex] += pkg.CreateRandomString(digit)
 						}
+					} else if arg == "," {
+						line = append(line, "")
+						lineIndex++
 					} else {
-						line += arg
+						line[lineIndex] += arg
 					}
 				}
-				writer.Write([]string{line})
+				writer.Write(line)
 			}
 			writer.Flush()
 		},

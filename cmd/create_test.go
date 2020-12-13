@@ -15,6 +15,7 @@ var createTests = []struct {
 	{[]string{"dummy", "-n", "3"}, `\A(dummy\n)+\z`},
 	{[]string{`/\w{4}/`, "-n", "3"}, `\A(\w{4}\n)+\z`},
 	{[]string{"dummy-", `/\d{4}/`, "-n", "3"}, `\A(dummy-\d{4}\n)+\z`},
+	{[]string{`/\d{4}/`, ",", `/\w{8}/`, "-n", "3"}, `\A(\d{4},\w{8}\n)+\z`},
 }
 
 func TestCreate(t *testing.T) {
