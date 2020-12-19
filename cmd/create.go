@@ -62,7 +62,7 @@ func NewCmdCreate() *cobra.Command {
 			writer.Flush()
 		},
 	}
-	cmd.Flags().StringVarP(&filepath, "file", "f", "tmp/example.csv", "file path where the csv file is created")
+	cmd.Flags().StringVarP(&filepath, "file", "f", "example.csv", "file path where the csv file is created")
 	cmd.Flags().IntVarP(&lineNumber, "line", "n", 100, "line number")
 	return cmd
 }
